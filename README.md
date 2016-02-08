@@ -1,6 +1,11 @@
 # wxpyodg
 Python lib for making wxPython UI from an openoffice draw file
 
-# Dependance
+# Dependances
 - wxPython 3
-- Pil lib for Python
+- Pillow library for Python
+
+# little how to
+- In openoffice (example carpc.odg)
+    - do a new odg file sized to a background image (must be the first draw in the odg file)
+     
