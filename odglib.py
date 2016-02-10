@@ -108,7 +108,7 @@ class odgSrc:
                 height = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}height'])
                 object = self.ptr[i].tag
                 #print xml[0]
-                print object
+                print object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
         except:
             """nop"""
         return self.uiPage
