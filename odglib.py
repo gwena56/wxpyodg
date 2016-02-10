@@ -106,9 +106,9 @@ class odgSrc:
                 x = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}x'])
                 width = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}width'])
                 height = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}height'])
-                object = self.ptr[i][0].text
-                print xml;object
-                print
+                object = self.ptr[i].tag
+                #print xml[0]
+                print object
         except:
             """nop"""
         return self.uiPage
