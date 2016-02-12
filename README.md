@@ -1,6 +1,6 @@
 # wxpyodg
 Python lib for making wxPython UI from an openoffice draw file
-
+![alt tag](https://github.com/gwena56/wxpyodg/master/howto/img1.png)
 # Dependances
 - wxPython 3
 - Pillow library for Python
