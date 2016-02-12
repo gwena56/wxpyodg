@@ -11,6 +11,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 import ConfigParser as ini
 from StringIO import StringIO
+import uiFunction
 # definition variables pour tous les scripts
 ERR_ODG = "Not a odg file."
 ERR_SYNTAX = "Syntax Error"
@@ -20,7 +21,7 @@ POINT = 0.03527777777778
 global file, odg, ptr, data, root, uiPage, Example, window, background, config,iniObjects, uiObjects
 #def
 def S2P(a):
-    return round(float(a[0:-2])/POINT) #-2 enleve la mesure cm
+    return int(round(float(a[0:-2])/POINT)) #-2 enleve la mesure cm
 def scale_bitmap(bitmap, width, height):
     image = wx.ImageFromBitmap(bitmap)
     image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
@@ -45,10 +46,7 @@ class odgSrc:
             else:
                 self.root = ET.fromstring(data)
             return self.root
-    def uiMake(self):
-        """uiMake"""
 
-              
     def setObjects(self,txt):
         """"setObjects"""
         config = ini.ConfigParser()
@@ -77,16 +75,6 @@ class odgSrc:
         bitmap = scale_bitmap(bitmap, self.uiPage['width'], self.uiPage['height'])
         control = wx.StaticBitmap(ou, -1, bitmap)
         
-    def drawBackground(self,ou,path):
-        """drawBackground"""
-        #image_data = self.odg.read(path)
-        #fh = StringIO(image_data)
-        #img=wx.ImageFromStream(fh, wx.BITMAP_TYPE_ANY )
-        img=wx.Image('./ui/'+self.uiPage['image'], wx.BITMAP_TYPE_ANY)
-        bitmap = wx.BitmapFromImage(img)
-        bitmap = scale_bitmap(bitmap, self.uiPage['width'], self.uiPage['height'])
-        control = wx.StaticBitmap(ou, -1, bitmap)
-
     def page(self):
         for self.ptr in self.root.iter('{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}page'):
             page = self.ptr[0].attrib
@@ -101,41 +89,54 @@ class odgSrc:
             for i in range(1,20) :
                 xml = self.ptr[i] 
                 object = self.ptr[i].attrib
+                #recupération du bloc objet de odg
                 y = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}y'])
                 x = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}x'])
                 width = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}width'])
                 height = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}height'])
                 object = self.ptr[i].tag
+                temp = "{'x':'"+str(x)+"','y':'" +str(y)+"','width':'"+str(width)+"','height':'"+str(height)+"'"
                 #calcul du type d'objet
                 typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
+                temp += ",'typeObject':'"+typeObject+"'"
                 if typeObject == "circle":
                     nom = self.ptr[i][0][0].text
-                    print "circle",y,x,width,height,nom 
+                    self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
                 if typeObject == "frame":
                     h = self.ptr[i][0].attrib
                     image = h['{http://www.w3.org/1999/xlink}href']
                     self.odg.extract(image,'./ui')
                     nom = self.ptr[i][0][0][0].text
-                    print "frame",y,x,width,height,image,nom
+                    temp += ",'image':'"+image+"'"
+                    self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
                 if typeObject == "custom-shape":
                     nom = self.ptr[i][0].text
-                    print "custom-shape",y,x,width,height,nom
-
-        except:
-            """nop"""
+                    self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
+        except IndexError:
+            """PPP"""
         return self.uiPage
     def button(self):
         """boutons"""
     def toggle(self):
         """toggle"""
 #### defS utilisant wxPython
+    def uiMake(self):
+        """uiMake"""
+        
+    def drawBackground(self,ou,path):
+        """drawBackground"""
+        img=wx.Image('./ui/'+self.uiPage['image'], wx.BITMAP_TYPE_ANY)
+        bitmap = wx.BitmapFromImage(img)
+        bitmap = scale_bitmap(bitmap, self.uiPage['width'], self.uiPage['height'])
+        control = wx.StaticBitmap(ou, -1, bitmap)
+
     def initUI(self):
         self.page()
+        uiFunction.test()
+        # print self.uiObjects['STD_LABEL_LCD']['y'] exemple de la coordonnée y de l'objet odg
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
         self.window.SetSize((self.uiPage['width'],self.uiPage['height']+20))
         fond = wx.Panel(self.window, -1)
         self.drawBackground(fond,self.uiPage['image'])
-        btn = platebtn.PlateButton(fond, label="", style=platebtn.PB_STYLE_NOBG)
-        btn.SetLabelColor(wx.BLUE, wx.BLUE)
         self.window.Centre()
         self.window.Show(True)
