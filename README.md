@@ -7,6 +7,7 @@ Python lib for making wxPython UI from an openoffice draw file
 - Pillow library for Python
 
 # little how to
+- use only png image file inside odg (very important)
 - In openoffice (See example carpc.odg)
     - do a new odg file sized to a background image (must be the first draw in the odg file)
     - Draw ui element (only rectangle and circle at the moment).

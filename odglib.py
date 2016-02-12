@@ -108,7 +108,19 @@ class odgSrc:
                 object = self.ptr[i].tag
                 #calcul du type d'objet
                 typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
-                if typeObject
+                if typeObject == "circle":
+                    nom = self.ptr[i][0][0].text
+                    print "circle",y,x,width,height,nom 
+                if typeObject == "frame":
+                    h = self.ptr[i][0].attrib
+                    image = h['{http://www.w3.org/1999/xlink}href']
+                    self.odg.extract(image,'./ui')
+                    nom = self.ptr[i][0][0][0].text
+                    print "frame",y,x,width,height,image,nom
+                if typeObject == "custom-shape":
+                    nom = self.ptr[i][0].text
+                    print "custom-shape",y,x,width,height,nom
+
         except:
             """nop"""
         return self.uiPage
