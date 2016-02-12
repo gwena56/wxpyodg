@@ -29,7 +29,7 @@ def scale_bitmap(bitmap, width, height):
 #CLASS
 
 class odgSrc:
-    """AZER"""
+    """odgScr"""
     def __init__(self):
         self.data=[]
         self.uiPage ={}
@@ -50,7 +50,7 @@ class odgSrc:
 
               
     def setObjects(self,txt):
-        """"AZER"""
+        """"setObjects"""
         config = ini.ConfigParser()
         config.read(txt)
         Objects = config.sections()
@@ -90,7 +90,6 @@ class odgSrc:
     def page(self):
         for self.ptr in self.root.iter('{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}page'):
             page = self.ptr[0].attrib
-            #self.uiPage['y'] = int(page['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}y'][0:-2])
         self.uiPage['y'] = S2P(page['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}y'])
         self.uiPage['x'] = S2P(page['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}x'])
         self.uiPage['width'] = S2P(page['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}width'])
@@ -107,8 +106,9 @@ class odgSrc:
                 width = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}width'])
                 height = S2P(object['{urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0}height'])
                 object = self.ptr[i].tag
-                #print xml[0]
-                print object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
+                #calcul du type d'objet
+                typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
+                if typeObject
         except:
             """nop"""
         return self.uiPage
