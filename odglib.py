@@ -17,7 +17,7 @@ ERR_ODG = "Not a odg file."
 ERR_SYNTAX = "Syntax Error"
 # constant
 POINT = 0.03527777777778
-# GLOABAL
+# GLOBAL
 global file, odg, ptr, data, root, uiPage, Example, window, background, config,iniObjects, uiObjects
 #def
 def S2P(a):
@@ -27,8 +27,7 @@ def scale_bitmap(bitmap, width, height):
     image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
     result = wx.BitmapFromImage(image)
     return result
-#CLASS
-
+# CLASS
 class odgSrc:
     """odgScr"""
     def __init__(self):
@@ -46,7 +45,7 @@ class odgSrc:
             else:
                 self.root = ET.fromstring(data)
             return self.root
-
+        
     def setObjects(self,txt):
         """"setObjects"""
         config = ini.ConfigParser()
