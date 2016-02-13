@@ -17,4 +17,13 @@ Python lib for making wxPython UI from an openoffice draw file
     - double-click on draw to put the name of the element as text.
 - Example main.py
     all in comments (french only)
-     
+
+#Todo List
+- Refresh drawing wxPython
+- Test Rasberry pi
+- Test CubieBoard
+- Test Win32
+- Test Ubuntu/Debian
+- Test Mac OS X
+    install several needed libraries with mac ports or pip (OK)
+    start with console/terminal(OK)
