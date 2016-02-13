@@ -109,26 +109,34 @@ class odgSrc:
                     temp += ",'image':'"+image+"'"
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
                 if typeObject == "custom-shape":
-                    nom = self.ptr[i][0].text
+                    nom = self.ptr[i][0][0].text
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
         except IndexError:
             """PPP"""
         return self.uiPage
-    def button(self):
-        """boutons"""
-    def toggle(self):
-        """toggle"""
+
 #### defS utilisant wxPython
     def uiMake(self):
-        """uiMake"""
+        """Example STD_PUSHBT_ONOFF -> 
+        STD_=standard item, 
+        PUSHBT_ = this is a push button
+        ONOFF = it's name"""
+        for uiObject in self.uiObjects.keys():
+            s = uiObject.split("_")
+            print s
+            if s[0]=="STD":
+                print "obj STD"
+    def pushbutton(self,object):
+        """boutons"""
+        print object
         
+
     def drawBackground(self,ou,path):
         """drawBackground"""
         img=wx.Image('./ui/'+self.uiPage['image'], wx.BITMAP_TYPE_ANY)
         bitmap = wx.BitmapFromImage(img)
         bitmap = scale_bitmap(bitmap, self.uiPage['width'], self.uiPage['height'])
         control = wx.StaticBitmap(ou, -1, bitmap)
-
     def initUI(self):
         self.page()
         uiFunction.test()
