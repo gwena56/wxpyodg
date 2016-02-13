@@ -25,5 +25,5 @@ Python lib for making wxPython UI from an openoffice draw file
 - Test Win32
 - Test Ubuntu/Debian
 - Test Mac OS X
-    install several needed libraries with mac ports or pip (OK)
-    start with console/terminal(OK)
+    - install several needed libraries with mac ports or pip (OK)
+    - start with console/terminal(OK)
