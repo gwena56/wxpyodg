@@ -6,6 +6,7 @@ from math import *
 import wx
 import wx.lib.platebtn as platebtn
 from PIL import Image
+from PIL import ImageDraw
 import ast
 import zipfile
 import xml.etree.ElementTree as ET
@@ -27,13 +28,16 @@ def scale_bitmap(bitmap, width, height):
     image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
     result = wx.BitmapFromImage(image)
     return result
+
 # CLASS
 class odgSrc:
     """odgScr"""
     def __init__(self):
         self.data=[]
         self.uiPage ={}
+        self.iniObjects={}
         self.uiObjects = {}
+        self.uiItems =  []
     def setUI(self,txt):
         self.odg = zipfile.ZipFile(txt, "r")
         for filename in ['content.xml']:
@@ -114,6 +118,19 @@ class odgSrc:
         except IndexError:
             """PPP"""
         return self.uiPage
+    def CreateOverPng(self,nom,x,y,width,height):
+        #print nom,x,y,width,height
+        img = Image.open("./ui/Pictures/background.png")
+        #bb = (int(x),int(y),int(width),int(height))
+        crop_rectangle = (int(x)-2,int(y)-2,int(x)+int(width)+4,int(y)+int(height)+4)
+        cropped_im = img.crop(crop_rectangle).convert('RGBA')
+        poly = Image.new('RGBA', cropped_im.size)
+        pdraw = ImageDraw.Draw(poly)
+        bb = (2,2,int(width)-2,int(height)-2)
+        pdraw.ellipse(bb, fill = (255,255,255,84))
+        cropped_im.paste(poly,mask=poly)
+        cropped_im.save("./ui/Pictures/"+nom+"_over.png")
+        return "./ui/Pictures/"+nom+"_over.png"
 
 #### defS utilisant wxPython
     def uiMake(self):
@@ -122,28 +139,36 @@ class odgSrc:
         PUSHBT_ = this is a push button
         ONOFF = it's name"""
         for uiObject in self.uiObjects.keys():
-            s = uiObject.split("_")
-            print s
-            if s[0]=="STD":
-                print "obj STD"
-    def pushbutton(self,object):
-        """boutons"""
-        print object
-        
-
+            print uiObject
+            obj = self.uiObjects[uiObject]
+            nom = uiObject.split("_")
+            if nom[1]=="PUSHBT":
+                self.pushbutton(obj,nom)
+    def pushbutton(self,obj,nom):
+        """bouton poussoir"""
+        if nom[0]=="STD":
+            bmp = self.CreateOverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
+        elif nom[0]=="BP":
+            """NOP"""
+        else :
+            """ Draw RED X ON IMAGE BLOC """ 
+        print obj       
     def drawBackground(self,ou,path):
         """drawBackground"""
         img=wx.Image('./ui/'+self.uiPage['image'], wx.BITMAP_TYPE_ANY)
         bitmap = wx.BitmapFromImage(img)
         bitmap = scale_bitmap(bitmap, self.uiPage['width'], self.uiPage['height'])
         control = wx.StaticBitmap(ou, -1, bitmap)
+        # save du fichier Background pour création des autres éléments
+        img=bitmap.ConvertToImage()
+        img.SaveFile("./ui/Pictures/background.png", wx.BITMAP_TYPE_PNG)
     def initUI(self):
         self.page()
         uiFunction.test()
         # print self.uiObjects['STD_LABEL_LCD']['y'] exemple de la coordonnée y de l'objet odg
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
         self.window.SetSize((self.uiPage['width'],self.uiPage['height']+20))
-        fond = wx.Panel(self.window, -1)
-        self.drawBackground(fond,self.uiPage['image'])
+        self.fond = wx.Panel(self.window, -1)
+        self.drawBackground(self.fond,self.uiPage['image'])
         self.window.Centre()
         self.window.Show(True)
