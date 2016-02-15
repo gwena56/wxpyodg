@@ -102,7 +102,8 @@ class odgSrc:
                 #calcul du type d'objet
                 typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
                 temp += ",'typeObject':'"+typeObject+"'"
-                if typeObject == "circle":
+                if typeObject == "circle" or typeObject == "ellipse":
+                    typeObject = "ellipse"
                     nom = self.ptr[i][0][0].text
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
                 if typeObject == "frame":
@@ -124,7 +125,7 @@ class odgSrc:
         img = Image.open("./ui/Pictures/background.png")
         #bb = (int(x),int(y),int(width),int(height))
         crop_rectangle = (int(x),int(y),int(x)+int(width),int(y)+int(height))
-        cropped_im = img.crop(crop_rectangle).convert('RGBA')
+        cropped_im = img.crop(crop_rectangle)#.convert('RGBA')
         cropped_im.save("./ui/Pictures/"+nom+".png")
         poly = Image.new('RGBA', cropped_im.size)
         pdraw = ImageDraw.Draw(poly)
@@ -132,7 +133,6 @@ class odgSrc:
         pdraw.ellipse(bb, fill = (255,255,255,84))
         cropped_im.paste(poly,mask=poly)
         cropped_im.save("./ui/Pictures/"+nom+"_hover.png")
-
 #### defS utilisant wxPython
     def uiMake(self):
         """Example STD_PUSHBT_ONOFF -> 
@@ -153,12 +153,16 @@ class odgSrc:
            self.CreateHoverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
            nImg = wx.Image("./ui/Pictures/"+nom[2]+".png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
            hImg = wx.Image("./ui/Pictures/"+nom[2]+"_hover.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
-           vars()[nom[2]] = wx.StaticBitmap(self.appBackground, -1, nImg, (int(obj['x']),int(obj['y'])),(int(obj['width']),int(obj['height'])))
-           print "VARS = ",vars()['ONOFF']
+           #(int(obj['x']),int(obj['y'])),(int(obj['width']),int(obj['height']))
+           vars()[nom[2]] = wx.BitmapButton(self.appBackground, -1, nImg,(int(obj['x']),int(obj['y'])), (int(obj['width']),int(obj['height'])), style=wx.BU_AUTODRAW|wx.NO_BORDER )
+           vars()[nom[2]].SetBitmap(nImg)
+           vars()[nom[2]].SetBitmapSelected(nImg)
+           vars()[nom[2]].SetBitmapHover(hImg)
         elif nom[0]=="BP":
             """NOP"""
         else :
             """ Draw RED X ON IMAGE BLOC """
+        
 
     def drawBackground(self,ou,path):
         """drawBackground"""
@@ -172,9 +176,9 @@ class odgSrc:
         
     def initUI(self):
         self.page()
-        print self.uiObjects.keys() #exemple de la coordonnée y de l'objet odg
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
         self.window.SetSize((self.uiPage['width'],self.uiPage['height']+20))
         self.appBackground = wx.Panel(self.window, -1)
         self.drawBackground(self.appBackground,self.uiPage['image'])
         self.uiMake()
+        print self.uiObjects.keys()
