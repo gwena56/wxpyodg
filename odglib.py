@@ -118,19 +118,20 @@ class odgSrc:
         except IndexError:
             """PPP"""
         return self.uiPage
-    def CreateOverPng(self,nom,x,y,width,height):
+    
+    def CreateHoverPng(self,nom,x,y,width,height):
         #print nom,x,y,width,height
         img = Image.open("./ui/Pictures/background.png")
         #bb = (int(x),int(y),int(width),int(height))
-        crop_rectangle = (int(x)-2,int(y)-2,int(x)+int(width)+4,int(y)+int(height)+4)
+        crop_rectangle = (int(x),int(y),int(x)+int(width),int(y)+int(height))
         cropped_im = img.crop(crop_rectangle).convert('RGBA')
+        cropped_im.save("./ui/Pictures/"+nom+".png")
         poly = Image.new('RGBA', cropped_im.size)
         pdraw = ImageDraw.Draw(poly)
-        bb = (2,2,int(width)-2,int(height)-2)
+        bb = (0,0,int(width),int(height))
         pdraw.ellipse(bb, fill = (255,255,255,84))
         cropped_im.paste(poly,mask=poly)
-        cropped_im.save("./ui/Pictures/"+nom+"_over.png")
-        return "./ui/Pictures/"+nom+"_over.png"
+        cropped_im.save("./ui/Pictures/"+nom+"_hover.png")
 
 #### defS utilisant wxPython
     def uiMake(self):
@@ -144,15 +145,21 @@ class odgSrc:
             nom = uiObject.split("_")
             if nom[1]=="PUSHBT":
                 self.pushbutton(obj,nom)
+                
     def pushbutton(self,obj,nom):
         """bouton poussoir"""
+        print obj
         if nom[0]=="STD":
-            bmp = self.CreateOverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
+           self.CreateHoverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
+           nImg = wx.Image("./ui/Pictures/"+nom[2]+".png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+           hImg = wx.Image("./ui/Pictures/"+nom[2]+"_hover.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+           vars()[nom[2]] = wx.StaticBitmap(self.appBackground, -1, nImg, (int(obj['x']),int(obj['y'])),(int(obj['width']),int(obj['height'])))
+           print "VARS = ",vars()['ONOFF']
         elif nom[0]=="BP":
             """NOP"""
         else :
-            """ Draw RED X ON IMAGE BLOC """ 
-        print obj       
+            """ Draw RED X ON IMAGE BLOC """
+
     def drawBackground(self,ou,path):
         """drawBackground"""
         img=wx.Image('./ui/'+self.uiPage['image'], wx.BITMAP_TYPE_ANY)
@@ -162,13 +169,12 @@ class odgSrc:
         # save du fichier Background pour création des autres éléments
         img=bitmap.ConvertToImage()
         img.SaveFile("./ui/Pictures/background.png", wx.BITMAP_TYPE_PNG)
+        
     def initUI(self):
         self.page()
-        uiFunction.test()
-        # print self.uiObjects['STD_LABEL_LCD']['y'] exemple de la coordonnée y de l'objet odg
+        print self.uiObjects.keys() #exemple de la coordonnée y de l'objet odg
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
         self.window.SetSize((self.uiPage['width'],self.uiPage['height']+20))
-        self.fond = wx.Panel(self.window, -1)
-        self.drawBackground(self.fond,self.uiPage['image'])
-        self.window.Centre()
-        self.window.Show(True)
+        self.appBackground = wx.Panel(self.window, -1)
+        self.drawBackground(self.appBackground,self.uiPage['image'])
+        self.uiMake()
