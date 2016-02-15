@@ -3,9 +3,11 @@ Python lib for making wxPython UI from an openoffice draw file
 - General view (mind mapping)
 ![alt tag](https://github.com/gwena56/wxpyodg/blob/master/howto/img1.png)
 - odglib view (mind mapping)
-    -![alt tag](https://github.com/gwena56/wxpyodg/blob/master/howto/img2.png)
+
+![alt tag](https://github.com/gwena56/wxpyodg/blob/master/howto/img2.png)
 - Parsing XML view (mind mapping)
-    -![alt tag](https://github.com/gwena56/wxpyodg/blob/master/howto/img3.png)
+
+![alt tag](https://github.com/gwena56/wxpyodg/blob/master/howto/img3.png)
 
 # Dependances
 - wxPython 3
