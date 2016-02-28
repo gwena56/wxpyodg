@@ -8,6 +8,7 @@ import wx.lib.platebtn as platebtn
 from PIL import Image
 from PIL import ImageDraw
 import ast
+import pprint
 import zipfile
 import xml.etree.ElementTree as ET
 import ConfigParser as ini
@@ -25,6 +26,7 @@ POINT = 0.03527777777778
 # GLOBAL
 global file, odg, ptr, data, root, uiPage, Example, window, background, config,iniParams, uiObjects
 #def
+
 def S2P(a):
     global POINT
     return int(round(float(a[0:-2])/POINT)) #-2 enleve la mesure cm
@@ -110,6 +112,7 @@ class odgSrc:
                 object = self.ptr[i].tag
                 temp = "{'x':'"+str(x)+"','y':'" +str(y)+"','width':'"+str(width)+"','height':'"+str(height)+"'"
                 #calcul du type d'objet
+                temp += ",'wxObject':'none'"
                 typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
                 temp += ",'typeObject':'"+typeObject+"'"
                 if typeObject == "circle" or typeObject == "ellipse":
@@ -117,6 +120,7 @@ class odgSrc:
                     nom = self.ptr[i][0][0].text
                     try :
                         action = self.ptr[i][1][0].text
+                        print action
                     except IndexError:
                         action ="none"
                     temp += ",'action':'"+action+"'"
@@ -150,7 +154,9 @@ class odgSrc:
         pdraw.ellipse(bb, fill = HOVER_MASK) #(255,255,255,84)
         cropped_im.paste(poly,mask=poly)
         cropped_im.save("./ui/Pictures/"+nom+"_hover.png")
-        
+####
+    def buttontest(self, text):
+        print text + " Button Test"        
 #### defS utilisant wxPython
     def uiMake(self):
         """Example STD_PUSHBT_ONOFF -> 
@@ -161,9 +167,8 @@ class odgSrc:
             obj = self.uiObjects[uiObject]
             nom = uiObject.split("_")
             if nom[1]=="PUSHBT":
-                self.pushbutton(obj,nom)
-                
-    def pushbutton(self,obj,nom):
+                self.uiObjects[uiObject]['wxObject'] = self.pushbutton(uiObject,obj,nom)
+    def pushbutton(self,uiObject,obj,nom):
         """bouton poussoir"""
         if nom[0]=="STD":
            self.CreateHoverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
@@ -171,10 +176,12 @@ class odgSrc:
            hImg = wx.Image("./ui/Pictures/"+nom[2]+"_hover.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
            #(int(obj['x']),int(obj['y'])),(int(obj['width']),int(obj['height']))
            #, style=wx.BU_AUTODRAW|wx.NO_BORDER 
-           vars()[nom[2]] = wx.BitmapButton(self.appBackground, -1, nImg,(int(obj['x'])-1,int(obj['y'])-1), (int(obj['width']),int(obj['height'])), style=wx.BU_AUTODRAW|wx.NO_BORDER)
+           vars()[nom[2]] = wx.BitmapButton(self.appBackground, -1, nImg,(int(obj['x'])-1,int(obj['y'])-1), (int(obj['width']),int(obj['height'])), style=wx.BU_AUTODRAW|wx.NO_BORDER, name=uiObject)
            vars()[nom[2]].SetBitmap(nImg)
            vars()[nom[2]].SetBitmapSelected(nImg)
            vars()[nom[2]].SetBitmapHover(hImg)
+           return vars()[nom[2]]
+
         elif nom[0]=="BP":
             """NOP"""
         else :
@@ -189,7 +196,11 @@ class odgSrc:
         # save du fichier Background pour création des autres éléments
         img=bitmap.ConvertToImage()
         img.SaveFile("./ui/Pictures/background.png", wx.BITMAP_TYPE_PNG)
-        
+### la grosse routine de gestion des clicks  
+    def OnCLick(self,e):  
+        obj = e.GetEventObject()
+        action = self.uiObjects[obj.Name]['action'].split("_")
+        print action
     def initUI(self):
         self.page()
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
@@ -197,4 +208,11 @@ class odgSrc:
         self.appBackground = wx.Panel(self.window, -1)
         self.drawBackground(self.appBackground,self.uiPage['image'])
         self.uiMake()
+        # boucle bind event sur chaque objets de Interface Utilisateur
+        for uiObject in self.uiObjects.keys():
+            print uiObject, self.uiObjects[uiObject]
+            if self.uiObjects[uiObject]['wxObject'] == "none":
+                """none"""
+            else:
+                self.uiObjects[uiObject]['wxObject'].Bind(wx.EVT_LEFT_DOWN, self.OnCLick)
         print PLATFORM
