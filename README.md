@@ -22,7 +22,7 @@ Python lib for making wxPython UI from an openoffice draw file
         Example
             draw a rectangle
             double-cick 
-                        first line put the name of the item ex STD_PUSHBT_<NAME>
+                        first line put the name of the item ex STD_PUSHBT_name
                         second line put command for the item ex RUN_python <script> 
 - Example main.py
     all in comments (french only)
