@@ -15,10 +15,15 @@ Python lib for making wxPython UI from an openoffice draw file
 
 # little how to
 - use only png image file inside odg (very important)
-- In openoffice (See example carpc.odg)
+- In openoffice (See example ./odg/carpc.odg)
     - do a new odg file sized to a background image (must be the first draw in the odg file)
-    - Draw ui element (only rectangle and circle at the moment).
+    - Draw ui element (only rectangle and circle/ellipse at the moment).
     - double-click on draw to put the name of the element as text.
+        Example
+            draw a rectangle
+            double-cick 
+                        first line put the name of the item ex STD_PUSHBT_<NAME>
+                        second line put command for the item ex RUN_python <script> 
 - Example main.py
     all in comments (french only)
 
