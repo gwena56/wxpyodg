@@ -23,8 +23,8 @@ Python lib for making wxPython UI from an openoffice draw file
         Example
             - draw a rectangle
             - double-cick 
-                        - first line put the name of the item ex STD_PUSHBT_name
-                        - second line put command for the item ex RUN_python <script> 
+                - first line put the name of the item ex STD_PUSHBT_name
+                - second line put command for the item ex RUN_python <script> 
 - Example carpc.py
     - all in comments (french only)
 - Example of Openoffice construct file
