@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 ###
 # import
+import socket
+import sys
+import shlex, subprocess
+import os
 from math import *
 import wx
 import wx.lib.platebtn as platebtn
@@ -24,7 +28,7 @@ HOVER_MASK = (255,255,255,255) # couleur des formes autocalculées pour l'hover 
 # constant
 POINT = 0.03527777777778
 # GLOBAL
-global file, odg, ptr, data, root, uiPage, Example, window, background, config,iniParams, uiObjects
+global file, odg, ptr, data, root, uiPage, Example, window, background, config,iniParams, uiObjects, app, screen
 #def
 
 def S2P(a):
@@ -44,6 +48,15 @@ class odgSrc:
         self.iniObjects={}
         self.uiObjects = {}
         self.uiItems =  []
+
+    def interpretor(self,action):
+        args = shlex.split(action)
+        try:
+            subprocess.check_output(args).split()
+        except Exception, e:
+            return "<1>"
+        return "<0>"
+
     def setUI(self,txt):
         self.odg = zipfile.ZipFile(txt, "r")
         for filename in ['content.xml']:
@@ -115,6 +128,7 @@ class odgSrc:
                 temp += ",'wxObject':'none'"
                 typeObject = object.replace("urn:oasis:names:tc:opendocument:xmlns:drawing:1.0","")[2:]
                 temp += ",'typeObject':'"+typeObject+"'"
+
                 if typeObject == "circle" or typeObject == "ellipse":
                     typeObject = "ellipse"
                     nom = self.ptr[i][0][0].text
@@ -125,6 +139,7 @@ class odgSrc:
                         action ="none"
                     temp += ",'action':'"+action+"'"
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
+
                 if typeObject == "frame":
                     h = self.ptr[i][0].attrib
                     image = h['{http://www.w3.org/1999/xlink}href']
@@ -132,6 +147,16 @@ class odgSrc:
                     nom = self.ptr[i][0][0][0].text
                     temp += ",'image':'"+image+"'"
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
+
+                if typeObject == "rect":
+                    nom = self.ptr[i][0][0].text
+                    try :
+                        action = self.ptr[i][1][0].text
+                        print "Action:",action
+                    except IndexError:
+                        action ="none"
+                    temp += ",'action':'"+action+"'"
+                    self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))                    
                 if typeObject == "custom-shape":
                     nom = self.ptr[i][0][0].text
                     self.uiObjects[nom] = dict(ast.literal_eval(temp + "}"))
@@ -139,7 +164,7 @@ class odgSrc:
             """PPP"""
         return self.uiPage
     
-    def CreateHoverPng(self,nom,x,y,width,height):
+    def CreateHoverPng(self,nom,x,y,width,height,typeObject):
         # on précise les global nécéssaires -> c'est surtout des variables du .ini
         global HOVER_MASK
         #print nom,x,y,width,height
@@ -151,13 +176,18 @@ class odgSrc:
         poly = Image.new('RGBA', cropped_im.size)
         pdraw = ImageDraw.Draw(poly)
         bb = (0,0,int(width),int(height))
-        pdraw.ellipse(bb, fill = HOVER_MASK) #(255,255,255,84)
+        if typeObject == "rect":
+            pdraw.rectangle(bb, fill = HOVER_MASK)
+        else:
+            pdraw.ellipse(bb, fill = HOVER_MASK) #(255,255,255,84)
         cropped_im.paste(poly,mask=poly)
         cropped_im.save("./ui/Pictures/"+nom+"_hover.png")
-####
-    def buttontest(self, text):
-        print text + " Button Test"        
+
+#### defS fonctions internes
+
+
 #### defS utilisant wxPython
+
     def uiMake(self):
         """Example STD_PUSHBT_ONOFF -> 
         STD_=standard item, 
@@ -168,10 +198,11 @@ class odgSrc:
             nom = uiObject.split("_")
             if nom[1]=="PUSHBT":
                 self.uiObjects[uiObject]['wxObject'] = self.pushbutton(uiObject,obj,nom)
+
     def pushbutton(self,uiObject,obj,nom):
         """bouton poussoir"""
         if nom[0]=="STD":
-           self.CreateHoverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'])
+           self.CreateHoverPng(nom[2],obj['x'],obj['y'],obj['width'],obj['height'],obj['typeObject'])
            nImg = wx.Image("./ui/Pictures/"+nom[2]+".png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
            hImg = wx.Image("./ui/Pictures/"+nom[2]+"_hover.png", wx.BITMAP_TYPE_PNG).ConvertToBitmap()
            #(int(obj['x']),int(obj['y'])),(int(obj['width']),int(obj['height']))
@@ -201,6 +232,13 @@ class odgSrc:
         obj = e.GetEventObject()
         action = self.uiObjects[obj.Name]['action'].split("_")
         print action
+        if action[0] == 'RUN':
+            if self.interpretor(action[1]) == '<1>':
+                print "Erreur"
+        if action[0] == 'EMBD':
+            print action[1]
+            if action[1] == 'QUITAPP' or action[1]=='QUITSCREEN':
+                print self.screen.Exit()
     def initUI(self):
         self.page()
         self.window = wx.Frame(None, style= wx.FULL_REPAINT_ON_RESIZE | wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX) 
@@ -215,4 +253,5 @@ class odgSrc:
                 """none"""
             else:
                 self.uiObjects[uiObject]['wxObject'].Bind(wx.EVT_LEFT_DOWN, self.OnCLick)
+                exit
         print PLATFORM
