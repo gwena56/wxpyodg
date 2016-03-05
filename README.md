@@ -12,6 +12,7 @@ Python lib for making wxPython UI from an openoffice draw file
 # Dependances
 - wxPython 3
 - Pillow library for Python
+- Some commons python lib (subprocess, shlex, os, sys, ...)
 
 # little how to
 - use only png image file inside odg (very important)
@@ -20,12 +21,14 @@ Python lib for making wxPython UI from an openoffice draw file
     - Draw ui element (only rectangle and circle/ellipse at the moment).
     - double-click on draw to put the name of the element as text.
         Example
-            draw a rectangle
-            double-cick 
-                        first line put the name of the item ex STD_PUSHBT_name
-                        second line put command for the item ex RUN_python <script> 
-- Example main.py
-    all in comments (french only)
+            - draw a rectangle
+            - double-cick 
+                        - first line put the name of the item ex STD_PUSHBT_name
+                        - second line put command for the item ex RUN_python <script> 
+- Example carpc.py
+    - all in comments (french only)
+- Example of Openoffice construct file
+    - show file carpcUImaking.odg in howto folder for comprehensive tool. 
 
 #Testing Todo List
 - Refresh drawing wxPython
