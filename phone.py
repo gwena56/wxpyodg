@@ -5,7 +5,7 @@ import argparse
 import wx
 odg = odgSrc()
 odg.setUI("./odg/phone.odg") #set User Interface from odg file
-odg.setParams("carpc.ini")
+odg.setParams("carpc.ini")# un petit peu de prefs !!
 odg.screen = wx.App() # on garde un peu de controle sur l'app
 odg.initUI() # on lance interface utilisateur
 odg.window.Centre() #on centre la fenetre principale
