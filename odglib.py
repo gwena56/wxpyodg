@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-###
-# import
+##########
+# import #
+##########
 import socket
 import sys
 import shlex, subprocess
@@ -52,10 +53,10 @@ class odgSrc:
     def interpretor(self,action):
         args = shlex.split(action)
         try:
-            subprocess.check_output(args).split()
+            scr = subprocess.check_output(args).split()
         except Exception, e:
             return "<1>"
-        return "<0>"
+        return scr
 
     def setUI(self,txt):
         self.odg = zipfile.ZipFile(txt, "r")
@@ -233,8 +234,11 @@ class odgSrc:
         action = self.uiObjects[obj.Name]['action'].split("_")
         print action
         if action[0] == 'RUN':
-            if self.interpretor(action[1]) == '<1>':
+            scr = self.interpretor(action[1])
+            if scr == '<1>':
                 print "Erreur"
+            else:
+                print scr
         if action[0] == 'EMBD':
             print action[1]
             if action[1] == 'QUITAPP' or action[1]=='QUITSCREEN':
