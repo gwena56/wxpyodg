@@ -10,7 +10,7 @@ import wx
 # --sqlite file
 # --web (html as text)
 parser = argparse.ArgumentParser()
-parser.add_argument("-t","--text",default ="La vache folle est rouge", help="text to be show in message screen")
+parser.add_argument("-t","--text",default ="Default message.py.", help="text to be show in message screen")
 parser.add_argument("-s","--size", help="text size in message screen")
 parser.add_argument("-f","--font", help="text font. default is one system font")
 parser.add_argument("-c","--color", help="color font web code only at the moment without ######.")
