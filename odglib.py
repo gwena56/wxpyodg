@@ -227,7 +227,6 @@ class odgSrc:
         return (r, g, b)
 
 #### defS utilisant wxPython
-
     def uiMake(self):
         """Example STD_PUSHBT_ONOFF -> 
         STD_=standard item, 
